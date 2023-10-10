@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Transcript</title>
+
+    <style type="text/css">
+		.highlight{
+			background: yellow;
+		}
+	</style>
+</head>
+<body>
+    <h1>Here is the transcript</h1>
+    <div id="content">
+
+
+    </div>
+    <button id="apply">Apply</button>
+    <!-- Display the transcript -->
+
+
+    <script>
+        var target = document.getElementById("content");
+        var vids = {{ script|tojson }};
+
+        console.log(vids);
+        var content = '';
+
+
+        vids.forEach(function(vid, i){
+            content += `<div id="content${i}" class="content"> <h2>Video ${i+1}</h2>`;
+            var count = 1;
+
+            vid.forEach(function(word){
+                 content += `<span id="${count}" start_time = "${word.start}" end_time="${word.end}">${word.word}</span>`
+
+                  count++;
+            })
+         content += `</div>`;
+
+
+
+        })
+
+        target.innerHTML = content;
+    </script>
+<script>
+        const myElements = document.getElementsByClassName("content");
+        const myElement = Array.from(myElements);
+        let isMouseDown = false;
+       var selected_text = {};
+        function handleMouseDown(event) {
+
+        	let item = event.target.getAttribute('id');
+
+        	if(item!='content'){
+        		 console.log("Mouse Down", event.target.attributes.start_time);
+
+            	isMouseDown = true;
+        	}
+
+
+        }
+
+        function handleMouseMove(event) {
+
+
+
+
+
+
+            if(isMouseDown==true){
+
+            	var div_id = event.target.closest("div").getAttribute('id');
+
+            	let item = event.target.getAttribute('id');
+
+            	if(item!='content'){
+		        	if(!selected_text[div_id].includes(item)){
+		        		selected_text[div_id].push(event.target.getAttribute('id'));
+		        	}
+	            	// console.log("Mouse Move", event.target.getAttribute('id'));
+
+	            	event.target.classList.add('highlight');
+
+	            	console.log(selected_text);
+	            }
+            }
+
+
+            // Add your mouse move logic here
+        }
+
+        function handleMouseUp(event) {
+            console.log("Mouse Up", event.target.attributes.end_time);
+
+            isMouseDown = false;
+            // Add your mouse up logic here
+        }
+
+        var selected_text = {};
+        myElement.forEach(function(v){
+
+        	var v_id = v.getAttribute('id');
+        	selected_text[v_id] = [];
+        	console.log(v_id);
+    	 	v.addEventListener("mousedown", handleMouseDown);
+	        v.addEventListener("mousemove", handleMouseMove);
+	        v.addEventListener("mouseup", handleMouseUp);
+	         v.addEventListener("contextmenu", handleRightClick);
+        })
+
+        // Attach event listeners in order
+
+
+        function handleRightClick(event) {
+        	event.preventDefault();
+
+        	var div_id = event.target.closest("div").getAttribute('id');
+            console.log("Right-click event occurred");
+
+            let item = event.target.getAttribute('id');
+            if(selected_text[div_id].includes(item)){
+            	let item_index = selected_text[div_id].indexOf(item);
+            	selected_text[div_id].splice(item_index,1);
+            	console.log(selected_text[div_id]);
+
+            }
+
+
+            // Perform your custom action here
+            // For example, you can change the element's background color
+            // myElement.style.backgroundColor = "blue";
+            event.target.classList.remove('highlight');
+        }
+
+        // Add a right-click event listener
+
+
+        // Prevent the default context menu (optional)
+        // myElement.addEventListener("contextmenu", function (event) {
+        //     event.preventDefault();
+        // });
+
+        const apply = document.getElementById('apply');
+
+
+        let clips = {};
+        function apply_filters(event){
+        	console.log(selected_text);
+
+        	for (var key in selected_text) {
+			  if (selected_text.hasOwnProperty(key)) {
+			    var value = selected_text[key];
+			    // console.log(key, value);
+
+			    // selected_text[key].forEach(function(i,vl){
+			    	// console.log(selected_text[key])
+	        		clips[key] = []
+
+	        		selected_text[key].sort(function(a, b) {
+					  return a - b;
+					});
+
+	        		var vl = selected_text[key];
+
+					console.log(vl);
+					let new_start_time = "";
+					let new_end_time = "";
+					let new_item = 0;
+					let last_word = vl[vl.length - 1];
+
+
+
+					vl.forEach(function(item){
+					console.log(item);
+
+
+						let word = document.querySelector(`#${key} span[id="${item}"]`);
+
+						if(new_item==0){
+		                     //alert("if 0 "+item);
+							new_item = item;
+
+
+							new_start_time = word.getAttribute('start_time');
+
+							new_end_time = word.getAttribute('end_time');
+
+							console.log(new_start_time);
+						}
+
+						if(new_item==item){
+							 //alert("if "+item);
+							new_end_time = word.getAttribute('end_time');
+							if(last_word==item){
+								let obj = {start_time: new_start_time, end_time: new_end_time};
+								clips[key].push(obj);
+								console.log(obj);
+							}
+						}else{
+		                    //alert("else " + item);
+		                    let obj = {start_time: new_start_time, end_time: new_end_time};
+							clips[key].push(obj);
+							console.log(obj);
+
+							new_item = item;
+							new_start_time =  word.getAttribute('start_time');
+							new_end_time = word.getAttribute('end_time');
+		                    console.log(new_start_time);
+
+		                    if(last_word==item){
+								let obj = {start_time: new_start_time, end_time: new_end_time};
+								clips[key].push(obj);
+								console.log(obj);
+							}
+
+						}
+
+
+						new_item++;
+
+					})
+
+
+
+
+	        	// })
+
+
+			  }
+			}
+
+
+
+
+            console.log(clips);
+
+			 let jsonclips = clips;
+			 let post = JSON.stringify({clip_timmings: jsonclips});
+             const url = "clips"
+             let xhr = new XMLHttpRequest()
+             xhr.open('POST', url, true)
+             xhr.setRequestHeader('Content-type', 'application/json; charset=UTF-8')
+             xhr.send(post);
+             xhr.onload = function () {
+                 if(xhr.status === 201) {
+                     console.log("Post successfully created!")
+                 }
+             }
+
+        }
+
+        apply.addEventListener("click", apply_filters);
+    </script>
+</body>
+</html>
