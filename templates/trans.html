@@ -5,8 +5,32 @@
 
     <style type="text/css">
 		.highlight{
-			background: yellow;
+			background: rgba(0, 255, 0, 0.2);
 		}
+        span{
+			cursor: crosshair;
+			font-size: 16px;
+		}
+
+		button{
+
+		}
+
+		body {
+  user-select: none;
+}
+
+#loader{
+	position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    background: #ffffffb5;
+    top: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
 	</style>
 </head>
 <body>
@@ -17,6 +41,11 @@
     </div>
     <button id="apply">Apply</button>
     <!-- Display the transcript -->
+<button id="select" onclick="sel_true()">Select</button>
+	<button id="deselect" onclick="sel_false()">De-Select</button>
+	<div id="loader">
+		<img src="https://www.autopoint.com/wp-content/uploads/2022/07/autopoint-loading-svg.gif" width="150">
+	</div>
 
 
     <script>
@@ -44,7 +73,33 @@
 
         target.innerHTML = content;
     </script>
-<script>
+
+ <script>
+
+ 	var sel = false;
+ 		function sel_true(){
+ 			// alert("true");
+
+ 			document.getElementById("deselect").style.background = "none";
+ 			document.getElementById("deselect").style.color = "#000";
+ 			document.getElementById("select").style.background = "#0082cf";
+ 			document.getElementById("select").style.color = "#fff";
+
+ 			sel = true;
+ 		}
+
+ 		function sel_false(){
+ 			// alert("false");
+ 			document.getElementById("select").style.background = "none";
+ 			document.getElementById("select").style.color = "#000";
+ 			document.getElementById("deselect").style.background = "#0082cf";
+ 			document.getElementById("deselect").style.color = "#fff";
+
+ 			sel = true;
+ 			sel = false;
+ 		}
+
+
         const myElements = document.getElementsByClassName("content");
         const myElement = Array.from(myElements);
         let isMouseDown = false;
@@ -76,15 +131,40 @@
             	let item = event.target.getAttribute('id');
 
             	if(item!='content'){
-		        	if(!selected_text[div_id].includes(item)){
-		        		selected_text[div_id].push(event.target.getAttribute('id'));
-		        	}
-	            	// console.log("Mouse Move", event.target.getAttribute('id'));
+            		console.log(sel);
+            		if(sel==true){
+            			if(!selected_text[div_id].includes(item) && (event.target.getAttribute('id')).includes('content')!=true){
+			        		selected_text[div_id].push(event.target.getAttribute('id'));
+			        	}
+		            	// console.log("Mouse Move", event.target.getAttribute('id'));
+			        	 if (event.target.tagName === 'SPAN') {
+						    event.target.classList.add('highlight');
+						  }
 
-	            	event.target.classList.add('highlight');
 
-	            	console.log(selected_text);
+		            	console.log(event.target);
+            		}else{
+            			console.log(sel);
+            			 if(selected_text[div_id].includes(item)){
+			            	let item_index = selected_text[div_id].indexOf(item);
+			            	selected_text[div_id].splice(item_index,1);
+			            	console.log(selected_text[div_id]);
+
+			            }
+		            	// console.log("Mouse Move", event.target.getAttribute('id'));
+			        	 if (event.target.tagName === 'SPAN') {
+						    event.target.classList.remove('highlight');
+						  }
+
+
+		            	console.log(event.target);
+            		}
+		        	 console.log(selected_text);
 	            }
+
+	             event.preventDefault();
+
+
             }
 
 
@@ -147,6 +227,8 @@
 
         let clips = {};
         function apply_filters(event){
+        	document.getElementById("loader").style.display = "flex";
+
         	console.log(selected_text);
 
         	for (var key in selected_text) {
@@ -234,7 +316,7 @@
 
 
 
-            console.log(clips);
+             console.log(clips);
 
 			 let jsonclips = clips;
 			 let post = JSON.stringify({clip_timmings: jsonclips});
@@ -244,9 +326,12 @@
              xhr.setRequestHeader('Content-type', 'application/json; charset=UTF-8')
              xhr.send(post);
              xhr.onload = function () {
-                 if(xhr.status === 201) {
-                     console.log("Post successfully created!")
-                 }
+                if(xhr.status===200){
+                document.getElementById('loader').style.display = "none";
+                   window.location.href = '/combined_video';
+                }else{
+                    alert("Something went wrong!");
+                }
              }
 
         }
