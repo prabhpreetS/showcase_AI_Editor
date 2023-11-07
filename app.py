@@ -1,5 +1,4 @@
 from flask import Flask,session,request, render_template, jsonify,redirect,url_for
-from flask import Flask, session
 from flask_session import Session
 import os
 import moviepy.editor as mp

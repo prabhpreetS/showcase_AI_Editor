@@ -2,18 +2,19 @@
 <html>
 <head>
     <title>Transcript</title>
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <style type="text/css">
 		.highlight{
 			background: rgba(0, 255, 0, 0.2);
 		}
         span{
-			cursor: crosshair;
+			cursor: text;
 			font-size: 16px;
 		}
 
 		button{
-
+   margin:20px 0;
 		}
 
 		body {
@@ -31,18 +32,31 @@
     align-items: center;
     justify-content: center;
 }
+        .content{
+            border: 1px solid #c3c1c1;
+    border-radius: 10px;
+    padding: 23px;
+        }
+        h2{
+        margin:12px 0;
+        }
 	</style>
 </head>
 <body>
+<div class="container">
+
     <h1>Here is the transcript</h1>
     <div id="content">
 
 
     </div>
-    <button id="apply">Apply</button>
+
+
+    <button id="apply" class="btn btn-primary">Apply</button>
     <!-- Display the transcript -->
-<button id="select" onclick="sel_true()">Select</button>
-	<button id="deselect" onclick="sel_false()">De-Select</button>
+<button id="select" onclick="sel_true()" class="btn btn-primary">Select</button>
+	<button id="deselect" onclick="sel_false()" class="btn btn-danger">De-Select</button>
+     </div>
 	<div id="loader">
 		<img src="https://www.autopoint.com/wp-content/uploads/2022/07/autopoint-loading-svg.gif" width="150">
 	</div>
@@ -57,7 +71,7 @@
 
 
         vids.forEach(function(vid, i){
-            content += `<div id="content${i}" class="content"> <h2>Video ${i+1}</h2>`;
+            content += `<h2>Video ${i+1}</h2><div id="content${i}" class="content"> `;
             var count = 1;
 
             vid.forEach(function(word){

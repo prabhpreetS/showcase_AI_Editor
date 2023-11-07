@@ -7,6 +7,7 @@
     <style>
       body {
         font-family: Arial, sans-serif;
+        background-color: #bebdbd;
       }
 
       h1,
@@ -75,6 +76,14 @@
         margin-top: 20px;
         text-align: center;
       }
+        .cursor{
+            cursor: grab;
+    width: fit-content;
+    margin: auto;
+        }
+        .cursor input{
+        margin-right:8px;
+        }
     </style>
   </head>
 
@@ -146,18 +155,18 @@
     <img src="{{ url_for('static', filename='upload/' + image_file) }}" alt="{{ image_file }}" />
     {% endfor %}
     <h2>Uploaded Videos:</h2>
-    <div class="container">
-      <div class="row">
+   <div class="container">
+    <div class="row">
         {% for video_file in video_files %}
-        <div class="col-lg-4">
-          <video class="w-100" height="360" controls>
-            <source src="{{ url_for('static', filename='upload/' + video_file) }}" type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
+        <div class="col-lg-4  video-container" id="video{{ loop.index }}">
+            <video class="w-100" height="360" controls>
+                <source src="{{ url_for('static', filename='upload/' + video_file) }}" type="video/mp4" />
+                Your browser does not support the video tag.
+            </video>
         </div>
         {% endfor %}
-      </div>
     </div>
+</div>
 
     {% if video_files %}
     <form method="get" action="/delete_videos">
@@ -165,12 +174,20 @@
     </form>
     <hr />
     <h2>Transcription:</h2>
-    <form method="POST" action="{{ url_for('generate_script') }}">
-      {% for video_file in video_files %}
+     <form method="POST" action="{{ url_for('generate_script') }}" id="generate_script_form">
+      <div class="sortable-list" id="sortable-list">
+        <!-- Add draggable attribute to each item -->
+        {% for video_file in video_files %}
+        <div class="draggable-item cursor" draggable="true" data-value="{{ video_file }}"  data-video-source="{{ url_for('static', filename='upload/' + video_file) }}">
+
       <input type="checkbox" name="video_filenames[]" value="{{ video_file }}" />{{ video_file }}<br />
+<!--      <input type="hidden" name="selected_order[]" value="{{ video_file }}" />-->
+</div>
       {% endfor %}
+</div>
       <input type="submit" value="Generate Script" id="generate-script-button" />
-    </form>
+
+</form>
 
     <div id="transcription">
       {% if transcript %}
@@ -199,4 +216,103 @@
       modal.style.display = "none";
     };
   </script>
+
+
+ <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+<script>
+    const sortableList = document.getElementById("sortable-list");
+
+    // Add event listeners for drag and drop
+    sortableList.addEventListener("dragstart", (e) => {
+        e.dataTransfer.setData("text/plain", e.target.dataset.value);
+    });
+
+    sortableList.addEventListener("dragover", (e) => {
+        e.preventDefault();
+    });
+
+sortableList.addEventListener("drop", (e) => {
+    e.preventDefault();
+    const data = e.dataTransfer.getData("text/plain");
+    const target = e.target;
+    const draggableItem = document.querySelector(`[data-value="${data}"]`);
+    if (target.classList.contains("draggable-item")) {
+        // Check the mouse position to decide whether to insert before or after the target
+        const rect = target.getBoundingClientRect();
+        const mouseY = e.clientY;
+        const midY = rect.top + rect.height / 2;
+        if (mouseY > midY) {
+            target.parentNode.insertBefore(draggableItem, target.nextSibling);
+        } else {
+            target.parentNode.insertBefore(draggableItem, target);
+        }
+        // Update the order of video-container elements based on the order of the draggable items
+        updateVideoOrder();
+    }
+});
+
+
+    // Function to update the order of video-container elements
+    function updateVideoOrder() {
+        const videoContainers = document.querySelectorAll(".video-container");
+        const draggableItems = document.querySelectorAll(".draggable-item");
+        $.each(draggableItems, function (index) {
+            const dataValue = $(this).data("value");
+
+            // console.log(dataValue);
+            const videoContainer = $("#video" + (index + 1));
+            // console.log(videoContainer);
+            videoContainer.empty(); // Clear the container
+            if (videoContainer) {
+                const video = $("<video>").addClass("w-100").attr("height", "360").attr("controls", "");
+                const source = $("<source>").attr("src", getVideoSource(dataValue)).attr("type", "video/mp4");
+                video.append(source);
+                videoContainer.append(video);
+            }
+        });
+    }
+
+    // Handle the "Generate Script" button click
+<!--    $("#generate-script-button").on("click", function (e) {-->
+<!--        e.preventDefault();-->
+
+<!--        // Get the selected items and their video sources-->
+<!--        const selectedItems = [];-->
+<!--        $(".draggable-item input[type=checkbox]:checked").each(function () {-->
+<!--            selectedItems.push({-->
+<!--                name: $(this).val(),-->
+<!--                source: getVideoSource($(this).val()),-->
+<!--            });-->
+<!--        });-->
+
+<!--        // Now you have an array of selected items with their names and sources-->
+<!--        console.log(selectedItems);-->
+
+<!--        // You can use this array to generate the script or perform other actions.-->
+<!--    });-->
+
+    // Function to retrieve the video source URL based on the selected item
+function getVideoSource(itemValue) {
+
+
+    // Retrieve the video source URL from the data-video-source attribute
+    const videoElement = $(".draggable-item[data-value='" + itemValue + "']");
+
+    const videoSource = videoElement.data("video-source");
+
+    console.log(videoSource);
+
+        return videoSource;
+
+
+    // Handle the case where the source URL is not found
+
+}
+
+
+
+
+</script>
 </html>
