@@ -5,6 +5,21 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <style type="text/css">
+
+           .content-container {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 10px;
+  display: inline-block;
+  cursor: grab;
+  transition: transform 0.3s ease; /* Adjust the duration and easing as needed */
+}
+
+.content-container.placeholder {
+  opacity: 0.4;
+  height: 50px; /* Adjust the height as needed */
+  pointer-events: none;
+}
 		.highlight{
 			background: rgba(0, 255, 0, 0.2);
 		}
@@ -40,59 +55,161 @@
         h2{
         margin:12px 0;
         }
+        .span_btn{
+        top:-13px;
+        left:0px;
+        }
 	</style>
 </head>
 <body>
-<div class="container">
+	<div class="container-fluid">
+        <div class="row mb-5">
+<!--  <div class="col-1" id="button-container" class="btn-container">-->
 
-    <h1>Here is the transcript</h1>
+<!--</div>-->
+
+
+        		<div class="col-10">
+
+    <h1>Transcripts</h1>
     <div id="content">
 
 
+
+
+
     </div>
+    </div></div>
 
-
-    <button id="apply" class="btn btn-primary">Apply</button>
+<div class="text-center">
+    <button id="apply" class="btn btn-primary">Apply Transcipts</button>
     <!-- Display the transcript -->
 <button id="select" onclick="sel_true()" class="btn btn-primary">Select</button>
-	<button id="deselect" onclick="sel_false()" class="btn btn-danger">De-Select</button>
+	<button id="deselect" onclick="sel_false()" class="btn btn-danger">Deselect</button>
+
+        </div>
      </div>
 	<div id="loader">
 		<img src="https://www.autopoint.com/wp-content/uploads/2022/07/autopoint-loading-svg.gif" width="150">
 	</div>
 
-
-    <script>
-        var target = document.getElementById("content");
-        var vids = {{ script|tojson }};
-
-        console.log(vids);
-        var content = '';
+ <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
 
-        vids.forEach(function(vid, i){
-            content += `<h2>Video ${i+1}</h2><div id="content${i}" class="content"> `;
-            var count = 1;
-
-            vid.forEach(function(word){
-                 content += `<span id="${count}" start_time = "${word.start}" end_time="${word.end}">${word.word}</span>`
-
-                  count++;
-            })
-         content += `</div>`;
+  <script>
 
 
 
-        })
+  $(function() {
+    $("#content").sortable({
+      containment: "parent",
+      cursor: "move",
+      scroll: false,
+      addClasses: true
+    });
+    $("#content").disableSelection();
+  });
+ const sortableList = document.getElementById("sortable-list");
+let draggedItem = null;
+let placeholder = null;
 
-        target.innerHTML = content;
+sortableList.addEventListener("dragstart", (e) => {
+    draggedItem = e.target;
+    e.dataTransfer.setData("text/plain", e.target.dataset.value);
+    e.dataTransfer.effectAllowed = "move";
+});
+
+sortableList.addEventListener("dragover", (e) => {
+    e.preventDefault();
+
+    const data = e.dataTransfer.getData("text/plain");
+    const targetItem = e.target;
+
+    if (targetItem.classList.contains("draggable-item") && draggedItem.classList.contains("draggable-item")) {
+        if (targetItem !== draggedItem) {
+            // Calculate the position of the dragged item
+            const rect = targetItem.getBoundingClientRect();
+            const mouseY = e.clientY;
+            const midY = rect.top + rect.height / 2;
+
+            if (mouseY > midY) {
+                targetItem.parentNode.insertBefore(draggedItem, targetItem.nextSibling);
+            } else {
+                targetItem.parentNode.insertBefore(draggedItem, targetItem);
+            }
+
+            // Remove any existing placeholder
+            if (placeholder) {
+                placeholder.remove();
+            }
+        } else if (!placeholder) {
+            // Create a placeholder element if there's no space
+            placeholder = document.createElement("div");
+            placeholder.className = "draggable-item placeholder";
+            placeholder.style.height = draggedItem.offsetHeight + "px";
+            draggedItem.parentNode.insertBefore(placeholder, draggedItem);
+        }
+    }
+});
+
+sortableList.addEventListener("drop", (e) => {
+    e.preventDefault();
+    if (draggedItem) {
+        // Remove the placeholder and reset the transform
+        if (placeholder) {
+            placeholder.remove();
+        }
+        draggedItem.style.transform = "translateY(0)";
+    }
+});
+
+
+  </script>
+<script>
+
+
+
+
+
+
+var target = document.getElementById("content");
+var vids = {{ script|tojson }};
+
+var content = '';
+
+// Add the buttons to the button container
+
+<!-- <h2>Video ${i + 1}</h2>??-->
+vids.forEach(function (vid, i) {
+<!--    var button = createVideoButton(i + 1);-->
+<!--    buttonContainer.appendChild(button);-->
+<!--  <div id="content2" data-value="content2" class="draggable-item" draggable="true">-->
+    content += `<br><br><div id="content${i + 1}" data-value="content${i + 1}" class="content content-container position-relative" draggable="true" ondragstart="drag(event)"><span class="btn btn-secondary position-absolute span_btn" style="cursor:move;">Primary</span>`;
+    var count = 1;
+
+    vid.forEach(function (word) {
+        content += `<span id="${count}" start_time="${word.start}" end_time="${word.end}">${word.word}</span>`;
+        count++;
+    });
+    content += `</div>`;
+});
+
+target.innerHTML = content;
+
+
+
+
+
     </script>
+
 
  <script>
 
  	var sel = false;
  		function sel_true(){
- 			// alert("true");
+
+
 
  			document.getElementById("deselect").style.background = "none";
  			document.getElementById("deselect").style.color = "#000";
@@ -103,7 +220,7 @@
  		}
 
  		function sel_false(){
- 			// alert("false");
+
  			document.getElementById("select").style.background = "none";
  			document.getElementById("select").style.color = "#000";
  			document.getElementById("deselect").style.background = "#0082cf";
@@ -246,6 +363,7 @@
         	console.log(selected_text);
 
         	for (var key in selected_text) {
+				console.log(key);
 			  if (selected_text.hasOwnProperty(key)) {
 			    var value = selected_text[key];
 			    // console.log(key, value);
@@ -254,9 +372,9 @@
 			    	// console.log(selected_text[key])
 	        		clips[key] = []
 
-	        		selected_text[key].sort(function(a, b) {
-					  return a - b;
-					});
+	        		// selected_text[key].sort(function(a, b) {
+					//   return a - b;
+					// });
 
 	        		var vl = selected_text[key];
 
