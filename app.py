@@ -25,8 +25,9 @@ def convert_to_mp4(input_file, output_file):
         'ffmpeg',
         '-i', input_file,
         '-c:v', 'libx264',  # Video codec
-        '-preset', 'fast',
-        '-crf', '10',       # Constant Rate Factor (0 to 51, lower is better quality)
+        '-preset', 'ultrafast',
+        '-threads', '4',  # Adjust the number of threads based on my cpu
+        '-crf', '23',       # Constant Rate Factor (0 to 51, lower is better quality)
         '-c:a', 'aac',      # Audio codec
         '-strict', 'experimental',  # Required for certain audio codecs
         output_file
@@ -63,7 +64,7 @@ def upload_file():
                 mp4_file_path = os.path.join(upload_dir, mp4_filename)
                 convert_to_mp4(file_path, mp4_file_path)
 
-        video_files = [f for f in os.listdir('static/upload') if f.endswith('.mp4') or f.endswith('.mts')]
+        video_files = [f for f in os.listdir('static/upload') if f.endswith('.mp4')]
         return render_template('index.html', video_files=video_files)
 
     else:
@@ -109,10 +110,15 @@ def extract_clips():
     c = 0
     for vidname, vid_times in multimedia.items(): #loop on videos
 
+        print(vidname)
+        result_string = vidname[len("content"):]
+        result_string = (int(result_string)-1)
+
+
         for i in vid_times: #loop on single video timings
             wstart = i['start_time']
             wend = i['end_time']
-            video = session.get('video_path')[c]
+            video = session.get('video_path')[result_string]
             print('video path-->', video)
             videofile = mp.VideoFileClip(video)
             #with mp.VideoFileClip(video) as videofile

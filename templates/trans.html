@@ -214,7 +214,7 @@ target.innerHTML = content;
  	var sel = false;
  		function sel_true(){
 
-
+<!--alert('hi');-->
             document.getElementById("drag_sel").style.background = "none";
  			document.getElementById("drag_sel").style.color = "#000";
  			document.getElementById("deselect").style.background = "none";
@@ -393,6 +393,8 @@ function drag_true(){
 
         let clips = {};
         function apply_filters(event){
+
+
         	document.getElementById("loader").style.display = "flex";
 
         	console.log(selected_text);
@@ -484,8 +486,27 @@ function drag_true(){
 
 
              console.log(clips);
+            var new_obj = {};
+             var all_divs = document.querySelectorAll('.content');
+            console.log(all_divs);
+                var div_id_arr = [];
+                all_divs.forEach(function(div){
 
-			 let jsonclips = clips;
+                    div_id_arr.push(div.getAttribute('id'));
+                    console.log(div.getAttribute('id'));
+                })
+
+                let keysInOrder = div_id_arr;
+
+                let reorderedObject = {};
+
+keysInOrder.forEach(key => {
+    reorderedObject[key] = clips[key];
+});
+
+
+
+			 let jsonclips = reorderedObject;
 			 let post = JSON.stringify({clip_timmings: jsonclips});
              const url = "clips"
              let xhr = new XMLHttpRequest()
