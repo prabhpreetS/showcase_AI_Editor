@@ -72,13 +72,14 @@
         		<div class="col-10">
 
     <h1>Transcripts</h1>
-    <div id="content">
+    <div id="content" style="height:100%">
 
 
 
 
 
     </div>
+
     </div></div>
 
 <div class="text-center">
@@ -104,13 +105,16 @@
 
   $(function() {
     $("#content").sortable({
+     axis:"y",
       containment: "parent",
       cursor: "move",
-      scroll: false,
+      scroll: true,
       addClasses: true
     });
     $("#content").disableSelection();
   });
+
+
  const sortableList = document.getElementById("sortable-list");
 let draggedItem = null;
 let placeholder = null;
@@ -186,14 +190,14 @@ vids.forEach(function (vid, i) {
 <!--    var button = createVideoButton(i + 1);-->
 <!--    buttonContainer.appendChild(button);-->
 <!--  <div id="content2" data-value="content2" class="draggable-item" draggable="true">-->
-    content += `<br><br><div id="content${i + 1}" data-value="content${i + 1}" class="content content-container position-relative" draggable="true" ondragstart="drag(event)"><span class="btn btn-secondary position-absolute span_btn" style="cursor:move;">Video ${i + 1}</span>`;
+    content += `<div id="content${i + 1}" data-value="content${i + 1}" class="content content-container position-relative" draggable="true" ondragstart="drag(event)"><span class="btn btn-secondary position-absolute span_btn" style="cursor:move;">Video ${i + 1}</span>`;
     var count = 1;
 
     vid.forEach(function (word) {
         content += `<span id="${count}" start_time="${word.start}" end_time="${word.end}">${word.word}</span>`;
         count++;
     });
-    content += `</div> <br><br>`;
+    content += `</div>`;
 });
 
 target.innerHTML = content;

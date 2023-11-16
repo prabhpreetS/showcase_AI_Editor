@@ -3,15 +3,40 @@ from flask_session import Session
 import os
 import moviepy.editor as mp
 from speechtotext import transcribenow
+import subprocess
+
 from flask import current_app
-from moviepy.editor import AudioFileClip
+# from moviepy.editor import AudioFileClip
+from moviepy.editor import VideoFileClip
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
 app.config['SESSION_TYPE'] = 'filesystem'
 app.secret_key = '12qw'
 Session(app)
 
+# def convert_to_mp4(input_file, output_file):
+#     clip = VideoFileClip(input_file)
+#     clip.write_videofile(output_file, codec='libx264')
+#     clip.close()
 
+def convert_to_mp4(input_file, output_file):
+    # Use ffmpeg to convert input_file to output_file
+    cmd = [
+        'ffmpeg',
+        '-i', input_file,
+        '-c:v', 'libx264',  # Video codec
+        '-preset', 'fast',
+        '-crf', '10',       # Constant Rate Factor (0 to 51, lower is better quality)
+        '-c:a', 'aac',      # Audio codec
+        '-strict', 'experimental',  # Required for certain audio codecs
+        output_file
+    ]
+
+    try:
+        subprocess.run(cmd, check=True)
+        print(f"Conversion successful: {input_file} -> {output_file}")
+    except subprocess.CalledProcessError as e:
+        print(f"Error during conversion: {e}")
 
 mp3filepath=None
 @app.route('/', methods=['GET', 'POST'])
@@ -25,15 +50,25 @@ def upload_file():
         # Loop through each uploaded file
         for file in request.files.getlist('file'):
             filename = file.filename
-            # Save the file to the "upload" folder in the "static" folder of project
-            file.save(os.path.join(upload_dir, filename))
 
-        video_files = [f for f in os.listdir('static/upload') if f.endswith('.mp4')]
+            # Save the file to the "upload" folder in the "static" folder of the project
+            file_path = os.path.join(upload_dir, filename)
+            file.save(file_path)
+            print(f"Uploaded file: {filename}, Extension: {os.path.splitext(filename)[1]}")
+
+            # Check if the uploaded file is in MTS format
+            if filename.lower().endswith('.mts'):
+                # Convert MTS to MP4
+                mp4_filename = os.path.splitext(filename)[0] + '.mp4'
+                mp4_file_path = os.path.join(upload_dir, mp4_filename)
+                convert_to_mp4(file_path, mp4_file_path)
+
+        video_files = [f for f in os.listdir('static/upload') if f.endswith('.mp4') or f.endswith('.mts')]
         return render_template('index.html', video_files=video_files)
 
     else:
         # Get a list of all the video files in the "upload" folder
-        video_files = [f for f in os.listdir('static/upload') if f.endswith('.mp4')]
+        video_files = [f for f in os.listdir('static/upload') if f.endswith('.mp4') or f.endswith('.mts')]
         # Render the HTML template and pass in the list of image and video files
         return render_template('index.html', video_files=video_files)
 
@@ -82,9 +117,7 @@ def extract_clips():
             videofile = mp.VideoFileClip(video)
             #with mp.VideoFileClip(video) as videofile
 
-            print('start-->',wstart,'end-->',wend)
 
-            print(videofile)
 
 
             extracted_clip = videofile.subclip(wstart,wend)
@@ -142,9 +175,11 @@ def timings():
 def delete_videos():
     video_dir = os.path.join('static', 'upload')
 
+
+
     # Delete all video files in the directory
     for filename in os.listdir(video_dir):
-        if filename.endswith('.mp4'):
+        if filename.endswith('.mp4') or filename.endswith('.mts'):
             file_path = os.path.join(video_dir, filename)
             if os.path.exists(file_path):
                 os.remove(file_path)
