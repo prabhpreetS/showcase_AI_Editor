@@ -223,6 +223,15 @@ target.innerHTML = content;
  			document.getElementById("select").style.color = "#fff";
 
  			sel = true;
+ 			<!--         if (event.button === 2) {-->
+<!--            // Right mouse button is held down-->
+<!--sel_false();-->
+
+<!--            // Add your logic for handling right mouse button hold here-->
+<!--        }-->
+<!--        else{-->
+<!--sel_true();-->
+<!--        }-->
 
             $( "#content" ).sortable("disable");
             return false;
@@ -230,7 +239,9 @@ target.innerHTML = content;
  		}
 
  		function sel_false(){
-            $("#content").sortable("cancel");
+
+
+<!--            $("#content").sortable("cancel");-->
 
 
             document.getElementById("drag_sel").style.background = "none";
@@ -271,6 +282,16 @@ function drag_true(){
         let isMouseDown = false;
        var selected_text = {};
         function handleMouseDown(event) {
+
+<!--         if (event.button === 2) {-->
+<!--            // Right mouse button is held down-->
+<!--sel_false();-->
+
+<!--            // Add your logic for handling right mouse button hold here-->
+<!--        }-->
+<!--        else{-->
+<!--sel_true();-->
+<!--        }-->
 
         	let item = event.target.getAttribute('id');
 
@@ -514,10 +535,18 @@ keysInOrder.forEach(key => {
              xhr.setRequestHeader('Content-type', 'application/json; charset=UTF-8')
              xhr.send(post);
              xhr.onload = function () {
+             console.log(xhr);
                 if(xhr.status===200){
                 document.getElementById('loader').style.display = "none";
                    window.location.href = '/combined_video';
-                }else{
+                }
+                      else if(xhr.status===500){
+                alert("Please Select Transcripts!");
+  document.getElementById('loader').style.display = "none";
+}
+
+                else{
+                   document.getElementById('loader').style.display = "none";
                     alert("Something went wrong!");
                 }
              }

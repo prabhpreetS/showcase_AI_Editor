@@ -69,7 +69,7 @@ def upload_file():
 
     else:
         # Get a list of all the video files in the "upload" folder
-        video_files = [f for f in os.listdir('static/upload') if f.endswith('.mp4') or f.endswith('.mts')]
+        video_files = [f for f in os.listdir('static/upload') if f.endswith('.mp4')]
         # Render the HTML template and pass in the list of image and video files
         return render_template('index.html', video_files=video_files)
 
@@ -113,26 +113,27 @@ def extract_clips():
         print(vidname)
         result_string = vidname[len("content"):]
         result_string = (int(result_string)-1)
+        print(len(vid_times))
+        if len(vid_times)>0:
+            for i in vid_times: #loop on single video timings
+
+                wstart = i['start_time']
+                wend = i['end_time']
+                video = session.get('video_path')[result_string]
+                print('video path-->', video)
+                videofile = mp.VideoFileClip(video)
+                #with mp.VideoFileClip(video) as videofile
 
 
-        for i in vid_times: #loop on single video timings
-            wstart = i['start_time']
-            wend = i['end_time']
-            video = session.get('video_path')[result_string]
-            print('video path-->', video)
-            videofile = mp.VideoFileClip(video)
-            #with mp.VideoFileClip(video) as videofile
 
 
-
-
-            extracted_clip = videofile.subclip(wstart,wend)
-            extractedclips.append(extracted_clip)
-            #videofile.close()
-
-        combined_clip = mp.concatenate_videoclips(extractedclips)
-        output_file_path = os.path.join('static', 'upload', 'combined_video.mp4')
-        combined_clip.write_videofile(output_file_path, codec="libx264")
+                extracted_clip = videofile.subclip(wstart,wend)
+                extractedclips.append(extracted_clip)
+                #videofile.close()
+            print(extractedclips)
+            combined_clip = mp.concatenate_videoclips(extractedclips)
+            output_file_path = os.path.join('static', 'upload', 'combined_video.mp4')
+            combined_clip.write_videofile(output_file_path, codec="libx264")
 
         c += 1
 
