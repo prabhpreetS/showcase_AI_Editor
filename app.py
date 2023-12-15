@@ -7,8 +7,10 @@ from speechtotext import transcribenow
 import subprocess
 logging.basicConfig(level=logging.INFO)
 from pychannel import audio_channel_extraction
-from sd import transcribenow1
-from new import transcribenow2
+import re
+from ats import ats
+# from sd import transcribenow1
+# from new import transcribenow2
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
 app.config['SESSION_TYPE'] = 'filesystem'
@@ -80,8 +82,8 @@ def upload_file():
             os.makedirs(output_directory, exist_ok=True)
             video_loc = os.path.join(upload_dir, video_file)
             try:
-                audio_channel_extraction(video_loc,output_directory)
-                response={'status': 'conversion success', 'message': 'audio is available'}
+                audio_channel_extraction(video_loc, output_directory)
+                response = {'status': 'conversion success', 'message': 'audio is available'}
             except Exception as e:
                 print(f'error during conversion{e}')
                 response = {'status': 'conversion failed', 'message': 'audio is not available'}
@@ -91,72 +93,105 @@ def upload_file():
         app.logger.info("recieved post req:")
         app.logger.info(request.form)
         app.logger.info(request.files)
-        return render_template('index.html', video_files=video_files, response=response,audio_files=audio_files)
+        return render_template('index.html', video_files=video_files, response=response, audio_files=audio_files)
 
     else:
         # Get a list of all the video files in the "upload" folder
         video_files = [f for f in os.listdir('static/upload') if f.endswith('.mp4')]
+        audio_files = [f for f in os.listdir('static/upload/separate_audio') if f.endswith('.mp3')]
+
         app.logger.info('recieved get req:')
         app.logger.info(request.form)
         app.logger.info(request.files)
         # Render the HTML template and pass in the list of image and video files
-        return render_template('index.html', video_files=video_files)
+        return render_template('index.html', video_files=video_files, audio_files=audio_files)
 
 
 @app.route('/generate_script', methods=['POST'])
 def generate_script():
     video_filenames = request.form.getlist('video_filenames[]')
+    print(f'video_filenames***********', video_filenames, '*' * 20)
+
     combined_script = []
     video_paths = []
-    for index,video_filename in enumerate(video_filenames):
-        video_path = os.path.join('static', 'upload', video_filename)
+    total_transcript = []
+    ats_combined_output = []
+    for index, video_filename in enumerate(video_filenames):
+        # video_path = os.path.join('static', 'upload', video_filename)
+        # video_paths.append(video_path)
+        # print('videopath::'+video_path)
+        audio_path_mp3 = os.path.join('static', 'upload', 'separate_audio', os.path.splitext(video_filename)[0] + '.mp3')
+        print(f'audioPahtmp3:::',audio_path_mp3)
+        print(video_filename)
+        new_video_filename = re.sub(r'^(.*?)_channel_\d+\.mp3$', r'\1.mp4', video_filename)
+        print(new_video_filename)
+        video_path = os.path.join('static', 'upload', new_video_filename)
+        print(video_path)
         video_paths.append(video_path)
-        print('videopath::'+video_path)
-
-        with mp.VideoFileClip(video_path) as clip:
-            audio_path_mp3 = os.path.join('static', 'upload', os.path.splitext(video_filename)[0] + '.mp3')
-
-            try:
-                clip.audio.write_audiofile(audio_path_mp3)
-                print(f'conversion successful: {audio_path_mp3}')
-                response = {'status': 'conversion successful', 'message': 'audio written successfully'}
-                app.logger.info(response)
-            except Exception as e:
-                print(f'error during conversion{e}')
-                response = {'status': 'conversion failed', 'message': 'audio is not available'}
-            finally:
-
-                clip.close()
+        # with mp.VideoFileClip(video_path) as clip:
+        #     # audio_path_mp3 = os.path.join('static', 'upload', os.path.splitext(video_filename)[0] + '.mp3')
+        #
+        #     try:
+        #         clip.audio.write_audiofile(audio_path_mp3)
+        #         print(f'conversion successful: {audio_path_mp3}')
+        #         response = {'status': 'conversion successful', 'message': 'audio written successfully'}
+        #         app.logger.info(response)
+        #     except Exception as e:
+        #         print(f'error during conversion{e}')
+        #         response = {'status': 'conversion failed', 'message': 'audio is not available'}
+        #     finally:
+        #
+        #         clip.close()
 
         with open(audio_path_mp3, 'rb'):
 
-            print('video : ', index+1)
-            script = transcribenow1(audio_path_mp3)
+            print('audio: ', index+1)
+            script, transcript = transcribenow(audio_path_mp3)
             combined_script.append(script)
-    print('combined_script::',combined_script)
+            total_transcript.append(transcript)
+            print('transcript-------------->',transcript)
+            combined_output = ats(transcript)
+            ats_combined_output.append(combined_output)
+            print('combined_output--------->',combined_output)
+
+
+    #print('combined_script::',combined_script)
     #app.logger.info('this is video paths: ', len(video_paths))
     app.logger.info(combined_script)
+
     session['video_path'] = video_paths
     app.logger.info(session['video_path'])
-    return render_template('trans.html', script=combined_script,response=response)
+    return render_template('trans.html', script=combined_script,video_paths=video_paths,ats_combined_output=ats_combined_output)
+
 
 @app.route('/delete_video_single', methods=['POST'])
 def delete_video_single():
-    filename = request.form.get('filename')
+    try:
+        filename = request.form.get('filename')
+        audionames = request.form.getlist('audionames[]')
 
-    # Assuming the videos are stored in the 'upload' folder
-    video_path = os.path.join('static', 'upload', filename)
+        # Assuming the videos are stored in the 'upload' folder
+        video_path = os.path.join('static', 'upload', filename)
 
-    # Remove the video file
-    if os.path.exists(video_path):
-        print(video_path,'before')
-        os.remove(video_path)
-        print(video_path, 'after')
-        app.logger.info(f"video_path-{video_path}")
+        # Remove the video file
+        if os.path.exists(video_path):
+            os.remove(video_path)
+            app.logger.info(f"Video file removed: {video_path}")
 
-    #return jsonify({'message': 'File deleted successfully'})
-    #return redirect(url_for('upload_file'))
-    return render_template('index.html', video_path=video_path)
+            # Remove associated audio files
+            for audiofile in audionames:
+                audio_path = os.path.join('static', 'upload', 'separate_audio', audiofile)
+                if os.path.exists(audio_path):
+                    os.remove(audio_path)
+                    app.logger.info(f"Audio file removed: {audio_path}")
+
+        return jsonify({'message': 'Files deleted successfully'})
+    except Exception as e:
+        app.logger.error(f"Error deleting files: {str(e)}")
+        return jsonify({'error': 'Internal Server Error'}), 500
+
+    finally:
+        return redirect(url_for('combined_video'))
 
 
 
@@ -166,6 +201,7 @@ def extract_clips():
 
     if request.method == 'POST':
         multimedia = request.json['clip_timmings']
+        #print('multimedia'*9, multimedia)
 
     extractedclips=[]
     #return multimedia;
@@ -173,7 +209,7 @@ def extract_clips():
     for vidname, vid_times in multimedia.items():
 #        #loop on videos
 
-        print(vidname)
+        print('vidname', vidname)
         result_string = vidname[len("content"):]
         result_string = (int(result_string)-1)
         print(len(vid_times))
@@ -183,7 +219,9 @@ def extract_clips():
 #loop on single video timings
 
                 wstart = i['start_time']
+                print(wstart)
                 wend = i['end_time']
+                print(wend)
                 video = session.get('video_path')[result_string]
                 print('video path-->', video)
                 videofile = mp.VideoFileClip(video)
@@ -195,7 +233,7 @@ def extract_clips():
 #               #videofile.close()
             print(extractedclips)
             combined_clip = mp.concatenate_videoclips(extractedclips)
-            output_file_path = os.path.join('static', 'upload', 'combined_video.mp4')
+            output_file_path = os.path.join('static', 'upload', 'final_video','combined_video.mp4')
             combined_clip.write_videofile(output_file_path, codec="libx264")
 
         c += 1
@@ -271,7 +309,7 @@ def delete_videos():
 @app.route('/combined_video', methods=['GET', 'POST'])
 def combined_video():
     # Get the path of the combined video
-    combined_video_path = os.path.join('static', 'upload', 'combined_video.mp4')
+    combined_video_path = os.path.join('static', 'upload', 'final_video','combined_video.mp4')
 
     return render_template('combined_video.html', combined_video_path=combined_video_path)
 

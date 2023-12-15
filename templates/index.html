@@ -4,11 +4,14 @@
     <title>ShowCase Media AI Video Editor</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+<script src="js/bootstrap.min.js"></script>
+<link href='https://fonts.googleapis.com/css?family=Montserrat+Alternates:400,700' rel='stylesheet' type='text/css'>
     <style>
 
       body {
         font-family: Arial, sans-serif;
-        background-color: #bebdbd;
+<!--        background-color: #bebdbd;-->
       }
 
       h1,
@@ -114,12 +117,114 @@
         }
 
 
+        .del-vid-but{
+        background:green;
+
+        }
+
+
+        audio{
+        width: 100%;
+        }
+
+        .thumb_video{
+          height:58%;
+        }
+
+<!--        .c1{-->
+<!--         border:1px solid black;-->
+<!--        }-->
+        .sec_uv{
+          background:#bebdbd;
+        }
+
+        .r_o_w{
+        min-height: 400px;
+        }
+
+        .nine h1 {
+  text-align:center; font-size:50px; text-transform:uppercase; color:#222; letter-spacing:1px;
+  font-family:"Playfair Display", serif; font-weight:400;
+}
+.nine h1 span {
+  margin-top: 5px;
+    font-size:15px; color:#444; word-spacing:1px; font-weight:normal; letter-spacing:2px;
+    text-transform: uppercase; font-family:"Raleway", sans-serif; font-weight:500;
+
+    display: grid;
+    grid-template-columns: 1fr max-content 1fr;
+    grid-template-rows: 27px 0;
+    grid-gap: 20px;
+    align-items: center;
+}
+
+.nine h1 span:after,.nine h1 span:before {
+    content: " ";
+    display: block;
+    border-bottom: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+    height: 5px;
+  background-color:#f8f8f8;
+}
+
+
+         .col_f{
+        position: relative;
+        background: #959595;
+        }
+
+        .form_up{
+         bottom: 0;
+         left: 0;
+         position: absolute;
+        }
+
+        .cp-text{
+        color: rgba(0,0,0,.7);
+        text-shadow: 0 1px rgba(255, 255, 255, 0.1);
+        background:#777;
+        text-align: center;
+        padding:2%;
+        }
+
+         .sel_audio {
+        display: none;
+    }
+
+    .display-block {
+        display: block !important;
+    }
+
+        .loader {
+   width:25px;
+   height:25px;
+   display:inline-block;
+   padding:0px;
+   border-radius:100%;
+   border:5px solid;
+   border-top-color:rgba(254, 168, 23, 0.65);
+   border-bottom-color:rgba(57, 154, 219, 0.65);
+   border-left-color:rgba(188, 84, 93, 0.95);
+   border-right-color:rgba(137, 188, 79, 0.95);
+   -webkit-animation: loader2 2s ease-in-out infinite alternate;
+   animation: loader2 2s ease-in-out infinite alternate;
+}
+@keyframes loader {
+   from {transform: rotate(0deg);}
+   to {transform: rotate(720deg);}
+}
+@-webkit-keyframes loader {
+   from {-webkit-transform: rotate(0deg);}
+   to {-webkit-transform: rotate(720deg);}
+}
     </style>
   </head>
 
   <body>
-    <h1>ShowCase Media AI Video Editor</h1>
 
+<div class="nine">
+  <h1>ShowCase Media<span>AI Video Editor</span></h1>
+</div>
     <!-- <p id="showmessage" class="text-center"></p> -->
 
     <div class="modal fade" id="showmessage" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" style="display: none">
@@ -147,29 +252,29 @@
       </div>
     </div>
 
-    <form id="transcription-form" method="POST" enctype="multipart/form-data" action="{{ url_for('upload_file') }}">
-          <div>
-        <!-- Custom button to trigger file input -->
-        <label for="fileInput" class="btn btn-light">Select Videos</label>
+<!--    <form id="transcription-form" method="POST" enctype="multipart/form-data" action="{{ url_for('upload_file') }}">-->
+<!--          <div>-->
+<!--        &lt;!&ndash; Custom button to trigger file input &ndash;&gt;-->
+<!--        <label for="fileInput" class="btn btn-light">Select Videos</label>-->
 
-        <!-- Actual file input (hidden) -->
-        <input type="file" class="video-input" id="fileInput" name="file" style="display:none" onchange="displayFileName(this)" accept="video/*" multiple/> <br />
+<!--        &lt;!&ndash; Actual file input (hidden) &ndash;&gt;-->
+<!--        <input type="file" class="video-input" id="fileInput" name="file" style="display:none" onchange="displayFileName(this)" accept="video/*" multiple/> <br />-->
 
-        <!-- Display the selected file name -->
-        <div id="fileName" class="file-name mt-2"></div>
-    </div>
-        <div>
-<!--      <input type="file" name="file" class="video-input btn btn-secondary" accept="image/*,video/*" multiple /><br />-->
-      <input type="submit" value="Upload Videos" id="uploadButton" />
-<!--        <img src="./static/upload/Spinloader.gif" width="2%" id="visible" >-->
+<!--        &lt;!&ndash; Display the selected file name &ndash;&gt;-->
+<!--        <div id="fileName" class="file-name mt-2"></div>-->
+<!--    </div>-->
+<!--        <div>-->
+<!--&lt;!&ndash;      <input type="file" name="file" class="video-input btn btn-secondary" accept="image/*,video/*" multiple /><br />&ndash;&gt;-->
+<!--      <input type="submit" value="Upload Videos" id="uploadButton" />-->
+<!--&lt;!&ndash;        <img src="./static/upload/Spinloader.gif" width="2%" id="visible" >&ndash;&gt;-->
 
-            <button style="display:none" class="btn btn-primary visible" type="submit" id="visible" >
-  <span  class="spinner-border spinner-border-sm " aria-hidden="true"></span>
-  <span role="status">Please wait</span>
-</button>
-</div>
+<!--            <button style="display:none" class="btn btn-primary visible" type="submit" id="visible" >-->
+<!--  <span  class="spinner-border spinner-border-sm " aria-hidden="true"></span>-->
+<!--  <span role="status">Please wait</span>-->
+<!--</button>-->
+<!--</div>-->
 
-    </form>
+<!--    </form>-->
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
       <script>
     // Function to display the selected file names
@@ -223,156 +328,481 @@ $(this).hide();
           console.log("Total number of files selected: " + totalFiles);
         });
       });
+
+
     </script>
 
-    <hr />
+<!--    <hr />-->
     <!--  <h2>Uploaded Images:</h2>-->
 
     {% for image_file in image_files %}
     <img src="{{ url_for('static', filename='upload/' + image_file) }}" alt="{{ image_file }}" />
     {% endfor %}
-    <h2>Uploaded Videos:</h2>
-   <div class="container">
-<div class="row">
+<!--<h2>Uploaded Videos:</h2>-->
+<!--<div class="container">-->
+<!--    <div class="row">-->
+<!--        {% for responses in response %}-->
+<!--            <h1>{{responses.message}}</h1>-->
+<!--        {% endfor %}-->
+
+<!--        {% for video_file in video_files %}-->
+<!--            <div class="col-lg-4 video-container" id="video{{ loop.index }}">-->
+<!--                <h3>{{video_file}}</h3>-->
+<!--                <video class="w-100" controls onplay="setAudio(this, '{{ video_file }}')">-->
+<!--                    <source src="{{ url_for('static', filename='upload/' + video_file) }}" type="video/mp4" />-->
+<!--                    <source src="{{ url_for('static', filename='upload/' + video_file) }}" type="video/mts" />-->
+<!--                    Your browser does not support the video tag.-->
+<!--                </video>-->
+<!-- <div class="container ">-->
+<!-- <div class="row ">-->
+
+<!--                {% for audio_file in audio_files %}-->
+<!--                    {% if audio_file.startswith(video_file|replace(".mp4", "")) %}-->
+
+<!-- <div class="col-lg-4 col-md-4 mt-3 ">-->
+
+<!--                            <audio id="audio{{ loop.index }}" controls data-audiofile="{{ audio_file }}" class="audiodelete">-->
+<!--                                <source src="{{ url_for('static', filename='upload/separate_audio/' + audio_file) }}" type="audio/mp3">-->
+<!--                                Your browser does not support the audio tag.-->
+<!--                            </audio>-->
+<!--                        </div>-->
+
+<!--&lt;!&ndash;                            <button class="delete-audio-btn play-btn" data-audiofile="{{ audio_file }}" type="button">Play</button>&ndash;&gt;-->
+<!--                    {% endif %}-->
+<!--                {% endfor %}-->
+
+<!--                        </div>-->
+<!--                        </div>-->
+
+<!--                <button class="delete-btn del-vid-but" data-filename="{{ video_file }}">Delete Video</button>-->
+<!--            </div>-->
+<!--        {% endfor %}-->
+<!--    </div>-->
+<!--</div>-->
 
 
-    {% for responses in response %}
-    <h1>{{responses.message}}</h1>
-    {% endfor %}
- {% for audio_file in audio_files %}
-    <audio          controls data-audiofile="{{ audio_file }}" class="audiodelete">
-  <source src="{{ url_for('static', filename='upload/separate_audio/' + audio_file) }}" type="audio/mp3">
-  Your browser does not support the audio tag.
-</audio>
-
-{% endfor %}
+<!--    <hr/>-->
 
 
- {% for video_file in video_files %}
-    <div class="col-lg-4 video-container" id="video{{ loop.index }}">
-        <video class="w-100" height="360" controls>
-            <source src="{{ url_for('static', filename='upload/' + video_file) }}" type="video/mp4" />
-            <source src="{{ url_for('static', filename='upload/' + video_file) }}" type="video/mts" />
-            Your browser does not support the video tag.
-        </video>
+ <div class="container-fluid sec_uv mt-5">
+        <div class="row c1 r_o_w">
+            <!-- Left Column with Video List -->
+            <div class="col-lg-2 c1 col_f">
 
-        <button class="delete-btn" data-filename="{{ video_file }}">Delete</button>
+                <div class="nine">
+      <h1>Your Uploaded<span> Videos </span></h1>
     </div>
+                <div class="row">
+                    {% for video_file in video_files %}
+                        <div class="col-lg-6 p-1 video-container" id="video{{ loop.index }}">
+                            <video class="w-100 thumb_video" data-src="{{ url_for('static', filename='upload/' + video_file) }}" data-filename="{{ video_file }}" >
+                                <source src="{{ url_for('static', filename='upload/' + video_file) }}" type="video/mp4" />
+                                <source src="{{ url_for('static', filename='upload/' + video_file) }}" type="video/mts" />
+                                Your browser does not support the video tag.
+                            </video>
+<!--                              {% for audio_file in audio_files %}-->
+<!--                    {% if audio_file.startswith(video_file|replace(".mp4", "")) %}-->
+
+<!-- <div class="col mt-3 ">-->
+
+<!--                            <audio id="audio{{ loop.index }}" controls data-audiofile="{{ audio_file }}" class="audiodelete">-->
+<!--                                <source src="{{ url_for('static', filename='upload/separate_audio/' + audio_file) }}" type="audio/mp3">-->
+<!--                                Your browser does not support the audio tag.-->
+<!--                            </audio>-->
+<!--                        </div>-->
+
+<!--&lt;!&ndash;                            <button class="delete-audio-btn play-btn" data-audiofile="{{ audio_file }}" type="button">Play</button>&ndash;&gt;-->
+<!--                    {% endif %}-->
+<!--                {% endfor %}-->
+                            <button class="delete-btn del-vid-but" data-filename="{{ video_file }}">Delete Video</button>
+                        </div>
+                    {% endfor %}
+
+                    <div class="form_up">
+                     <form id="transcription-form" method="POST" enctype="multipart/form-data" action="{{ url_for('upload_file') }}">
+              <div>
+            <!-- Custom button to trigger file input -->
+            <label for="fileInput" class="btn btn-light">Select Videos</label>
+
+            <!-- Actual file input (hidden) -->
+            <input type="file" class="video-input" id="fileInput" name="file" style="display:none" onchange="displayFileName(this)" accept="video/*" multiple/> <br />
+
+            <!-- Display the selected file name -->
+            <div id="fileName" class="file-name mt-2"></div>
+        </div>
+            <div>
+    <!--      <input type="file" name="file" class="video-input btn btn-secondary" accept="image/*,video/*" multiple /><br />-->
+          <input type="submit" class="mb-5" value="Upload Videos" id="uploadButton" />
+    <!--        <img src="./static/upload/Spinloader.gif" width="2%" id="visible" >-->
+
+                <button style="display:none" class="btn btn-primary visible" type="submit" id="visible" >
+      <span  class="spinner-border spinner-border-sm " aria-hidden="true"></span>
+      <span role="status">Please wait</span>
+    </button>
+    </div>
+
+        </form>
+                </div>
+                </div>
+
+                <div>
+     {% if video_files %}
+        <form method="get" action="/delete_videos">
+          <button type="submit" class="btn btn-danger">Delete All Videos</button>
+        </form>
+    {% endif %}
+                </div>
+            </div>
+
+            <!-- Center Column with Active Video -->
+           <div class="col-lg-7 c1 mb-5">
+        <div class="nine">
+            <h1>Selected<span> Video </span></h1>
+        </div>
+        <div class="col video-container" id="activeVideo">
+            <!-- Video will be displayed here -->
+        </div>
+
+        <div class="container">
+            <div class="row" id="relatedAudios">
+                <!-- Related audios will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+            <!-- Right Column with Selected Audio -->
+            <div class="col-lg-3 c1 col_f">
+                  <div class="nine">
+      <h1> Transcription<span> Audio: </span></h1>
+    </div>
+
+               <form method="POST" action="{{ url_for('generate_script') }}" id="generate_script_form">
+{% for audio_file in audio_files %}
+                   <div data-audiofile="{{ audio_file }}" class="sel_audio">
+<input type="checkbox" name="video_filenames[]" value="{{ audio_file }}" />{{ audio_file }}<br />
+           <audio controls data-audiofile="{{ audio_file }}">
+            <source src="{{ url_for('static', filename='upload/separate_audio/') }}{{ audio_file }}" type="audio/mpeg">
+        </audio></div>
 {% endfor %}
-</div>
+<input type="submit" value="Generate Script" id="generate-script-button" />
+         <span style="color:red;display:none"  id="message_no_script">Please Select the Videos:</span>
+ <div id="loader" style="display:none;">
+        Generating Transcription ....
+    </div>
 
-</div>
-    <script>
+</form>
+
+            </div>
+        </div>
+    </div>
+
+
+<p class="cp-text">
+    © Copyright 2023 Company Name. All rights reserved.
+</p>
+
+<script>
     $(document).ready(function () {
+        // Event handler for checkbox clicks
+        $("input[name='video_filenames[]']").click(function () {
+            var selectedValues = $("input[name='video_filenames[]']:checked").map(function () {
+                return this.value;
+            }).get();
+            console.log("Selected Video Filenames: ", selectedValues);
+        });
 
-        $('.delete-btn').on('click', function () {
-            var filename = $(this).data('filename');
+        // Event handler for the "Generate Script" button
+        $("#generate-script-button").click(function (e) {
+            e.preventDefault();
+            var selectedFiles = $("input[name='video_filenames[]']:checked").length;
+
+            if (selectedFiles > 0) {
+                var selectedValues = $("input[name='video_filenames[]']:checked").map(function () {
+                    return this.value;
+                }).get();
+                console.log("Selected Video Filenames: ", selectedValues);
+
+                // Show loader
+                $("#loader").show();
+
+                // Hide error message
+                $("#message_no_script").hide();
+
+                // Optionally, you can hide or disable the submit button while loading
+                $(this).prop('disabled', true);
+
+                // Submit the form
+                $('form#generate_script_form').submit();
+            } else {
+                // Show error message
+                $("#message_no_script").show();
+                e.preventDefault();
+            }
+        });
+    });
+</script>
+
+
+
+
+
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Display the first video by default
+        var defaultVideoSrc = document.querySelector('.thumb_video').getAttribute('data-src');
+        var defaultVideoName = document.querySelector('.thumb_video').getAttribute('data-filename');
+        displayActiveVideo(defaultVideoSrc, defaultVideoName);
+    });
+
+    document.addEventListener('click', function(event) {
+        if (event.target.classList.contains('thumb_video')) {
+            var videoSrc = event.target.getAttribute('data-src');
+            var videoName = event.target.getAttribute('data-filename');
+            displayActiveVideo(videoSrc, videoName);
+        }
+
+         if (event.target.type === 'checkbox' && event.target.name === 'video_filenames[]') {
+        synchronizeCheckboxes(event.target);
+          toggleSelAudioDisplay(event.target.value);
+    }
+
+    // Handle checkbox clicks in the "Selected Audio" section
+    if (event.target.type === 'checkbox' && event.target.name === 'selected_audios[]') {
+        synchronizeCheckboxes(event.target);
+          toggleSelAudioDisplay(event.target.value);
+
+    }
+
+    });
+
+
+   function toggleSelAudioDisplay(audioFileName) {
+        var selAudioElements = document.querySelectorAll('.sel_audio[data-audiofile="' + audioFileName + '"]');
+
+        selAudioElements.forEach(function (selAudioElement) {
+            // Toggle the display style
+            selAudioElement.style.display = (selAudioElement.style.display === 'none' || selAudioElement.style.display === '') ? 'block' : 'none';
+        });
+    }
+
+    function synchronizeCheckboxes(clickedCheckbox) {
+    var audioFileName = clickedCheckbox.value;
+    var correspondingCheckbox;
+
+    // Find the corresponding checkbox in the other set
+    if (clickedCheckbox.name === 'video_filenames[]') {
+        correspondingCheckbox = document.querySelector('input[name="selected_audios[]"][value="' + audioFileName + '"]');
+    } else if (clickedCheckbox.name === 'selected_audios[]') {
+        correspondingCheckbox = document.querySelector('input[name="video_filenames[]"][value="' + audioFileName + '"]');
+    }
+
+    // Update the state of the corresponding checkbox
+    if (correspondingCheckbox) {
+        correspondingCheckbox.checked = clickedCheckbox.checked;
+    }
+}
+
+    // Assuming video_files and audio_files are available globally
+    var videoFiles = {{ video_files|tojson }};
+    var audioFiles = {{ audio_files|tojson }};
+
+    function displayActiveVideo(videoSrc, videoName) {
+        var activeVideoContainer = document.getElementById('activeVideo');
+        activeVideoContainer.innerHTML = ''; // Clear existing content
+
+        var videoElement = document.createElement('video');
+        videoElement.className = 'w-100';
+        videoElement.controls = true;
+        videoElement.innerHTML = '<source src="' + videoSrc + '" type="video/mp4" />' +
+            'Your browser does not support the video tag.';
+
+        activeVideoContainer.appendChild(videoElement);
+
+        // Display video name dynamically
+        var videoNameElement = document.createElement('p');
+        videoNameElement.innerText = 'Selected Video: ' + videoName;
+        activeVideoContainer.appendChild(videoNameElement);
+
+        // Display related audios
+        displayRelatedAudios(videoName);
+    }
+
+ function displayRelatedAudios(videoName) {
+        var relatedAudiosContainer = document.getElementById('relatedAudios');
+        relatedAudiosContainer.innerHTML = ''; // Clear existing content
+
+        var commonPart = videoName.replace(".mp4", "");
+
+        var relatedAudios = audioFiles.filter(function(audioFile) {
+            return audioFile.startsWith(commonPart);
+        });
+
+        relatedAudios.forEach(function(audioFile) {
+            var audioDiv = document.createElement('div');
+            audioDiv.className = 'col-lg-4 col-md-4 mt-3';
+
+            // Display checkbox
+            var checkboxDiv = document.createElement('div');
+            checkboxDiv.className = 'form-check';
+
+            var checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'form-check-input';
+            checkbox.name = 'selected_audios[]';
+            checkbox.value = audioFile;
+
+            checkboxDiv.appendChild(checkbox);
+            audioDiv.appendChild(checkboxDiv);
+
+            // Display audio name
+            var audioName = document.createElement('p');
+            audioName.innerText = audioFile;
+            audioDiv.appendChild(audioName);
+
+            // Display audio element
+            var audioElement = document.createElement('audio');
+            audioElement.id = 'audio' + audioDiv.children.length;
+            audioElement.className = 'audiodelete';
+            audioElement.controls = true;
+            audioElement.dataset.audiofile = audioFile;
+
+            var audioSource = document.createElement('source');
+            audioSource.src = '{{ url_for('static', filename='upload/separate_audio/') }}' + audioFile;
+            audioSource.type = 'audio/mp3';
+
+            audioElement.appendChild(audioSource);
+            audioDiv.appendChild(audioElement);
+
+            relatedAudiosContainer.appendChild(audioDiv);
+        });
+    }
+</script>
+
+
+
+ <script>
+ $(document).ready(function () {
+    $('.delete-btn').on('click', function () {
+        var filename = $(this).data('filename');
         var commonPart = filename.split(' ')[0];
 
         // Select both audio and video elements with the common part
-        var audiofile = $('[data-audiofile^="' + commonPart + '"]');
-        var videoContainer = $('.video-container [data-filename^="' + commonPart + '"]');
+        var audiofiles = $('[data-audiofile^="' + commonPart + '"]').map(function() {
+            return $(this).data('audiofile');
+        }).get();
 
-        // Check if the audiofile element exists before attempting to remove
-        if (audiofile.length > 0) {
-            audiofile.remove();
-            console.log('Audio file removed:', commonPart);
-        } else {
-            console.log('Audio file not found:', commonPart);
-        }
-             console.log(audiofile);
+        console.log("Audio files removed:", audiofiles);
 
+        // Remove both video and audio containers from the frontend
+        var videoContainer = $(this).closest('.video-container');
+        videoContainer.remove();
 
+        $('[data-audiofile^="' + commonPart + '"]').remove();
 
-<!--            alert(filename);-->
-            var videoContainer = $(this).closest('.video-container');
+        $('#sortable-list').find('[data-value="' + filename + '"]').remove();
 
-            // Remove the video container from the frontend
-            videoContainer.remove();
-
-            $('#sortable-list').find('[data-value="' + filename + '"]').remove();
-
-
-            // Make an asynchronous request to delete the file on the server
-            $.ajax({
-                type: 'POST',
-                url: '/delete_video_single',
-                data: { filename: filename },
-                success: function (response) {
-
-                    console.log('File deleted successfully');
-                },
-                error: function (error) {
-                    console.error('Error deleting file:', error);
-                    // You might want to handle errors more gracefully
-                }
-            });
+        // Make an asynchronous request to delete the file on the server
+        $.ajax({
+            type: 'POST',
+            url: '/delete_video_single',
+            data: {
+                filename: filename,
+                audionames: audiofiles
+            },
+            success: function (response) {
+                console.log('File deleted successfully');
+            },
+            error: function (error) {
+                console.error('Error deleting file:', error);
+                // You might want to handle errors more gracefully
+            }
         });
     });
+});
+
+
 </script>
 
-    {% if video_files %}
-    <form method="get" action="/delete_videos">
-      <button type="submit" class="btn btn-danger">Delete All Videos</button>
-    </form>
-    <hr />
-    <h2>Generate <br>Transcription :</br></h2>
-     <form method="POST" action="{{ url_for('generate_script') }}" id="generate_script_form">
-      <div class="sortable-list" id="sortable-list">
-        <!-- Add draggable attribute to each item -->
-        {% for video_file in video_files %}
-        <div class="draggable-item cursor" draggable="true" data-value="{{ video_file }}"  data-video-source="{{ url_for('static', filename='upload/' + video_file) }}">
+<!--<script>-->
+<!--    function setAudio(video, videoFile) {-->
+<!--        const videoName = videoFile.replace(".mp4", "");-->
+<!--        const audioElements = document.querySelectorAll(`#video${video.id} audio[data-audiofile^='${videoName}']`);-->
 
-      <input type="checkbox" name="video_filenames[]" value="{{ video_file }}" />{{ video_file }}<br />
-<!--      <input type="hidden" name="selected_order[]" value="{{ video_file }}" />-->
-</div>
-      {% endfor %}
-</div>
-      <input type="submit" value="Generate Script" id="generate-script-button" />
-         <span style="color:red;display:none"  id="message_no_script">Please Select the Videos:</span>
+<!--        if (audioElements.length > 0) {-->
+<!--            audioElements.forEach(audioElement => {-->
+<!--                audioElement.currentTime = 0;-->
+<!--                audioElement.play();-->
+<!--            });-->
+<!--        }-->
+<!--    }-->
 
- <button style="display:none" class="btn btn-primary generate_script" type="submit" id="generate_script" >
-  <span  class="spinner-border spinner-border-sm " aria-hidden="true"></span>
-  <span role="status">Please wait</span>
-</button>
-</form>
+<!--    document.addEventListener('DOMContentLoaded', function () {-->
+<!--        // Add event listeners to all play buttons-->
+<!--        const playButtons = document.querySelectorAll('.play-btn');-->
+<!--        playButtons.forEach(button => {-->
+<!--            button.addEventListener('click', function () {-->
+<!--                const audioFile = this.getAttribute('data-audiofile');-->
+<!--                const audioElement = document.querySelector(`audio[data-audiofile='${audioFile}']`);-->
 
-   <script>
-    $(document).ready(function () {
-        $("#generate-script-button").click(function (e) {
-            e.preventDefault();
- var selectedFiles = $("input[name='video_filenames[]']:checked").length;
-
-            if (selectedFiles > 0) {
-
-
-
-$(this).hide();
-$("#message_no_script").hide();
-
-       $('button.generate_script').show();
-            $('form#generate_script_form').submit();
+<!--                if (audioElement) {-->
+<!--                    if (audioElement.paused) {-->
+<!--                        audioElement.currentTime = 0;-->
+<!--                        audioElement.play();-->
+<!--                    } else {-->
+<!--                        audioElement.pause();-->
+<!--                    }-->
+<!--                }-->
+<!--            });-->
+<!--        });-->
+<!--    });-->
+<!--</script>-->
 
 
-          } else {
-
-            $("#message_no_script").show();
-             e.preventDefault();
-          }
-
-        });
-    });
-</script>
+<!--</div>-->
 
 
-    <div id="transcription">
-      {% if transcript %}
-      <h3>Generated Script:</h3>
-      <pre>{{ transcript }}</pre>
-      {% endif %}
-    </div>
-    <a href="{{ url_for('timings') }}" id="timings-link">Enter Timings</a>
-    {% endif %}
+<!--    {% if video_files %}-->
+<!--    <form method="get" action="/delete_videos">-->
+<!--      <button type="submit" class="btn btn-danger">Delete All Videos</button>-->
+<!--    </form>-->
+<!--    <hr />-->
+<!--    <h2>Generate <br>Transcription :</br></h2>-->
+<!--     <form method="POST" action="{{ url_for('generate_script') }}" id="generate_script_form">-->
+<!--&lt;!&ndash;      <div class="sortable-list" id="sortable-list">&ndash;&gt;-->
+<!--&lt;!&ndash;         Add draggable attribute to each item&ndash;&gt;-->
+<!--&lt;!&ndash;           {% if audio_files %}&ndash;&gt;-->
+<!--        {% for audio_file in audio_files %}-->
+<!--&lt;!&ndash;        <div class="draggable-item cursor" draggable="true" data-value="{{ audio_file }}"  data-video-source="{{ url_for('static', filename='upload/' + audio_file) }}">&ndash;&gt;-->
+
+<!--      <input type="checkbox" name="video_filenames[]" value="{{ audio_file }}"/>{{ audio_file }}<br />-->
+<!--           <audio controls>-->
+<!--            <source src="{{ url_for('static', filename='upload/separate_audio/') }}{{ audio_file }}" type="audio/mpeg">-->
+<!--        </audio>-->
+<!--&lt;!&ndash;      <input type="hidden" name="selected_order[]" value="{{ video_file }}" />&ndash;&gt;-->
+<!--&lt;!&ndash;</div>&ndash;&gt;-->
+<!--      {% endfor %}-->
+<!--&lt;!&ndash;          {% endif %}&ndash;&gt;-->
+<!--&lt;!&ndash;</div>&ndash;&gt;-->
+<!--      <input type="submit" value="Generate Script" id="generate-script-button" />-->
+<!--         <span style="color:red;display:none"  id="message_no_script">Please Select the Videos:</span>-->
+
+
+<!--</form>-->
+
+
+
+
+<!--    <div id="transcription">-->
+<!--      {% if transcript %}-->
+<!--      <h3>Generated Script:</h3>-->
+<!--      <pre>{{ transcript }}</pre>-->
+<!--      {% endif %}-->
+<!--    </div>-->
+<!--    <a href="{{ url_for('timings') }}" id="timings-link">Enter Timings</a>-->
+<!--    {% endif %}-->
 <!--    &lt;!&ndash; The Modal &ndash;&gt;-->
 <!--    <div id="uploadSuccessModal" class="modal">-->
 <!--      <div class="modal-content">-->
@@ -380,6 +810,12 @@ $("#message_no_script").hide();
 <!--        <p>Files uploaded and saved successfully!</p>-->
 <!--      </div>-->
 <!--    </div>-->
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
   </body>
   <script>
     var modal = document.getElementById("uploadSuccessModal");
@@ -470,4 +906,6 @@ function getVideoSource(itemValue) {
 
 
 </script>
+
+
 </html>

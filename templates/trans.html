@@ -7,11 +7,12 @@
     <style type="text/css">
 
            .content-container {
-  border: 1px solid #ccc;
+  border: 1px solid white;
   padding: 10px;
-  margin: 10px;
+  margin: 6%;
   display: inline-block;
   cursor: grab;
+  border-radius: 36px;
   transition: transform 0.3s ease; /* Adjust the duration and easing as needed */
 }
 
@@ -48,7 +49,7 @@
     justify-content: center;
 }
         .content{
-            border: 1px solid #c3c1c1;
+<!--            border: 1px solid #c3c1c1;-->
     border-radius: 10px;
     padding: 23px;
         }
@@ -59,30 +60,117 @@
         top:-13px;
         left:0px;
         }
+
+
+
+        .nine h1 {
+  text-align:center; font-size:50px; text-transform:uppercase; color:#222; letter-spacing:1px;
+  font-family:"Playfair Display", serif; font-weight:400;
+}
+.nine h1 span {
+  margin-top: 5px;
+    font-size:15px; color:#444; word-spacing:1px; font-weight:normal; letter-spacing:2px;
+    text-transform: uppercase; font-family:"Raleway", sans-serif; font-weight:500;
+
+    display: grid;
+    grid-template-columns: 1fr max-content 1fr;
+    grid-template-rows: 27px 0;
+    grid-gap: 20px;
+    align-items: center;
+}
+
+.nine h1 span:after,.nine h1 span:before {
+    content: " ";
+    display: block;
+    border-bottom: 1px solid #222;
+    border-top: 1px solid #222;
+    height: 5px;
+  background-color:#bebdbd;
+}
+
+
+        .sec_uv{
+          background:#bebdbd;
+        }
+
+        .r_o_w{
+        min-height: 400px;
+        }
+
+      .cen-col{
+      background:#959595;
+      }
+
+          .cp-text{
+        color: rgba(0,0,0,.7);
+        text-shadow: 0 1px rgba(255, 255, 255, 0.1);
+        background:#777;
+        text-align: center;
+        padding:2%;
+        }
+
+                .ninet h1 {
+  text-align:center; font-size:50px; text-transform:uppercase; color:#222; letter-spacing:1px;
+  font-family:"Playfair Display", serif; font-weight:400;
+}
+.ninet h1 span {
+  margin-top: 5px;
+    font-size:15px; color:#444; word-spacing:1px; font-weight:normal; letter-spacing:2px;
+    text-transform: uppercase; font-family:"Raleway", sans-serif; font-weight:500;
+
+    display: grid;
+    grid-template-columns: 1fr max-content 1fr;
+    grid-template-rows: 27px 0;
+    grid-gap: 20px;
+    align-items: center;
+}
+
+.ninet h1 span:after,.ninet h1 span:before {
+    content: " ";
+    display: block;
+    border-bottom: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+    height: 5px;
+  background-color:#fff;
+}
 	</style>
 </head>
 <body>
-	<div class="container-fluid">
-        <div class="row mb-5">
-<!--  <div class="col-1" id="button-container" class="btn-container">-->
 
-<!--</div>-->
-
-
-        		<div class="col-10">
-
-    <h1>Transcripts</h1>
-    <div id="content" style="height:100%">
+<div class="ninet mt-5 mb-5">
+  <h1>ShowCase Media<span>AI Video Editor</span></h1>
+</div>
 
 
-
-
-
+	<div class="container-fluid sec_uv">
+<div id="loader">
+		<img src="https://www.autopoint.com/wp-content/uploads/2022/07/autopoint-loading-svg.gif" width="150">
+	</div>
+        <div class="row r_o_w">
+            <div class="col-lg-3">
+                 <div class="nine mt-4">
+      <h1>Your Uploaded<span> Videos </span></h1>
     </div>
 
-    </div></div>
+               {% for video_path in video_paths %}
+                        <div class="col-lg-6 p-1 video-container" id="video{{ loop.index }}">
+                            <p>Video{{ loop.index  }}</p>
+        <video class="w-100 thumb_video" data-src="{{ video_path }}" data-filename="{{ video_path }}">
+            <source src="{{ video_path }}" type="video/mp4" />
+            <source src="{{ video_path }}" type="video/mts" />
+            Your browser does not support the video tag.
+        </video>
+                        </div>
+                    {% endfor %}
+            </div>
 
-<div class="text-center">
+
+            <div class="col-lg-6 cen-col">
+                  <div class="nine mt-4">
+      <h1>Transcripts<span> Text </span></h1>
+    </div>
+    <div id="content" ></div>
+                <div class="text-center">
     <button id="apply" class="btn btn-primary">Apply Transcipts</button>
     <!-- Display the transcript -->
     <button id="drag_sel" onclick="drag_true()" class="btn btn-primary">Drag</button>
@@ -90,13 +178,86 @@
 	<button id="deselect" onclick="sel_false()" class="btn btn-danger">Deselect</button>
 
         </div>
-     </div>
-	<div id="loader">
-		<img src="https://www.autopoint.com/wp-content/uploads/2022/07/autopoint-loading-svg.gif" width="150">
-	</div>
+
+            </div>
+
+
+            <div class="col-lg-3">
+                 <div class="nine mt-4">
+      <h1>Select & Create <span> New video </span></h1>
+    </div>
+                 <div id="selected-text-column"></div>
+            </div>
+        </div>
+
+<p class="cp-text">
+    © Copyright 2023 Company Name. All rights reserved.
+</p>
+
+<!--        <div class="row mb-5">-->
+<!--&lt;!&ndash;  <div class="col-1" id="button-container" class="btn-container">&ndash;&gt;-->
+
+<!--&lt;!&ndash;</div>&ndash;&gt;-->
+
+<!--        		<div class="col-10">-->
+
+
+
+<!--    </div></div>-->
+
+
 
  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+
+<!--       <script>-->
+<!--    function displaySelectedText() {-->
+<!--        // Get the selected text from each content container-->
+<!--        let selectedText = {};-->
+<!--        const contentContainers = document.querySelectorAll('.content');-->
+
+<!--        contentContainers.forEach(function (container) {-->
+<!--            const containerId = container.getAttribute('id');-->
+<!--            selectedText[containerId] = [];-->
+
+<!--            const selectedSpans = container.querySelectorAll('span.highlight');-->
+
+<!--            selectedSpans.forEach(function (span) {-->
+<!--                selectedText[containerId].push(span.textContent);-->
+<!--            });-->
+<!--        });-->
+
+<!--        // Display the selected text in the right column-->
+<!--        const rightColumn = document.getElementById('selected-text-column');-->
+<!--        let content = '';-->
+
+<!--        for (const [containerId, textArray] of Object.entries(selectedText)) {-->
+<!--            content += `<div><strong>${containerId}:</strong></div>`;-->
+<!--            content += `<p>${textArray.join(' ')}</p>`;-->
+<!--        }-->
+
+<!--        rightColumn.innerHTML = content;-->
+<!--    }-->
+
+<!--    function handleSelection(event) {-->
+<!--        if (event.target.tagName === 'SPAN') {-->
+<!--            event.target.classList.toggle('highlight');-->
+<!--            displaySelectedText(); // Update display when selection changes-->
+<!--        }-->
+<!--    }-->
+
+<!--    // Attach the handleSelection function to the content container-->
+<!--    const contentContainer = document.getElementById('content');-->
+<!--    contentContainer.addEventListener('mousedown', function () {-->
+<!--        contentContainer.addEventListener('mousemove', handleSelection);-->
+<!--    });-->
+
+<!--    contentContainer.addEventListener('mouseup', function () {-->
+<!--        contentContainer.removeEventListener('mousemove', handleSelection);-->
+<!--        displaySelectedText(); // Update display when mouseup occurs-->
+<!--    });-->
+<!--</script>-->
 
 
   <script>
@@ -133,7 +294,6 @@ sortableList.addEventListener("dragover", (e) => {
 
     if (targetItem.classList.contains("draggable-item") && draggedItem.classList.contains("draggable-item")) {
         if (targetItem !== draggedItem) {
-            // Calculate the position of the dragged item
             const rect = targetItem.getBoundingClientRect();
             const mouseY = e.clientY;
             const midY = rect.top + rect.height / 2;
@@ -144,7 +304,6 @@ sortableList.addEventListener("dragover", (e) => {
                 targetItem.parentNode.insertBefore(draggedItem, targetItem);
             }
 
-            // Remove any existing placeholder
             if (placeholder) {
                 placeholder.remove();
             }
@@ -161,7 +320,6 @@ sortableList.addEventListener("dragover", (e) => {
 sortableList.addEventListener("drop", (e) => {
     e.preventDefault();
     if (draggedItem) {
-        // Remove the placeholder and reset the transform
         if (placeholder) {
             placeholder.remove();
         }
@@ -183,14 +341,13 @@ var vids = {{ script|tojson }};
 
 var content = '';
 
-// Add the buttons to the button container
 
 <!-- <h2>Video ${i + 1}</h2>??-->
 vids.forEach(function (vid, i) {
 <!--    var button = createVideoButton(i + 1);-->
 <!--    buttonContainer.appendChild(button);-->
 <!--  <div id="content2" data-value="content2" class="draggable-item" draggable="true">-->
-    content += `<div id="content${i + 1}" data-value="content${i + 1}" class="content content-container position-relative" draggable="true" ondragstart="drag(event)"><span class="btn btn-secondary position-absolute span_btn" style="cursor:move;">Video ${i + 1}</span>`;
+    content += `<div id="content${i + 1}" data-value="content${i + 1}" class="content conti content-container position-relative" draggable="true" ondragstart="drag(event)"><span class="btn btn-secondary position-absolute span_btn" style="cursor:move;">Video ${i + 1}</span>`;
     var count = 1;
 
     vid.forEach(function (word) {
@@ -224,10 +381,8 @@ target.innerHTML = content;
 
  			sel = true;
  			<!--         if (event.button === 2) {-->
-<!--            // Right mouse button is held down-->
 <!--sel_false();-->
 
-<!--            // Add your logic for handling right mouse button hold here-->
 <!--        }-->
 <!--        else{-->
 <!--sel_true();-->
@@ -436,20 +591,16 @@ function drag_true(){
 
 	        		var vl = selected_text[key];
 
-					console.log(vl);
-					let new_start_time = "";
-					let new_end_time = "";
-					let new_item = 0;
-					let last_word = vl[vl.length - 1];
+console.log(vl);
+let new_start_time = "";
+let new_end_time = "";
+let new_item = 0;
+let last_word = vl[vl.length - 1];
 
+vl.forEach(function(item) {
+    console.log(item);
 
-
-					vl.forEach(function(item){
-					console.log(item);
-
-
-						let word = document.querySelector(`#${key} span[id="${item}"]`);
-
+    let word = document.querySelector(`#${key} span[id="${item}"]`);
 						if(new_item==0){
 		                     //alert("if 0 "+item);
 							new_item = item;
