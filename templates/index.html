@@ -114,6 +114,26 @@
         }
 
 
+        .del-vid-but{
+        background:green;
+
+        }
+
+
+        audio{
+        width: 100%;
+        }
+
+        .thumb_video{
+          height:58%;
+        }
+
+        .c1{
+         border:1px solid black;
+        }
+<!--        .sec_uv{-->
+<!--          background:black;-->
+<!--        }-->
     </style>
   </head>
 
@@ -225,41 +245,205 @@ $(this).hide();
       });
     </script>
 
-    <hr />
+<!--    <hr />-->
     <!--  <h2>Uploaded Images:</h2>-->
 
     {% for image_file in image_files %}
     <img src="{{ url_for('static', filename='upload/' + image_file) }}" alt="{{ image_file }}" />
     {% endfor %}
-    <h2>Uploaded Videos:</h2>
-   <div class="container">
-<div class="row">
+<h2>Uploaded Videos:</h2>
+<div class="container">
+    <div class="row">
+        {% for responses in response %}
+            <h1>{{responses.message}}</h1>
+        {% endfor %}
 
+        {% for video_file in video_files %}
+            <div class="col-lg-4 video-container" id="video{{ loop.index }}">
+                <h3>{{video_file}}</h3>
+                <video class="w-100" controls onplay="setAudio(this, '{{ video_file }}')">
+                    <source src="{{ url_for('static', filename='upload/' + video_file) }}" type="video/mp4" />
+                    <source src="{{ url_for('static', filename='upload/' + video_file) }}" type="video/mts" />
+                    Your browser does not support the video tag.
+                </video>
+ <div class="container ">
+ <div class="row ">
 
-    {% for responses in response %}
-    <h1>{{responses.message}}</h1>
-    {% endfor %}
- {% for audio_file in audio_files %}
-    <audio          controls data-audiofile="{{ audio_file }}" class="audiodelete">
-  <source src="{{ url_for('static', filename='upload/separate_audio/' + audio_file) }}" type="audio/mp3">
-  Your browser does not support the audio tag.
-</audio>
+                {% for audio_file in audio_files %}
+                    {% if audio_file.startswith(video_file|replace(".mp4", "")) %}
 
-{% endfor %}
+ <div class="col-lg-4 col-md-4 mt-3 ">
 
+                            <audio id="audio{{ loop.index }}" controls data-audiofile="{{ audio_file }}" class="audiodelete">
+                                <source src="{{ url_for('static', filename='upload/separate_audio/' + audio_file) }}" type="audio/mp3">
+                                Your browser does not support the audio tag.
+                            </audio>
+                        </div>
 
- {% for video_file in video_files %}
-    <div class="col-lg-4 video-container" id="video{{ loop.index }}">
-        <video class="w-100" height="360" controls>
-            <source src="{{ url_for('static', filename='upload/' + video_file) }}" type="video/mp4" />
-            <source src="{{ url_for('static', filename='upload/' + video_file) }}" type="video/mts" />
-            Your browser does not support the video tag.
-        </video>
+<!--                            <button class="delete-audio-btn play-btn" data-audiofile="{{ audio_file }}" type="button">Play</button>-->
+                    {% endif %}
+                {% endfor %}
 
-        <button class="delete-btn" data-filename="{{ video_file }}">Delete</button>
+                        </div>
+                        </div>
+
+                <button class="delete-btn del-vid-but" data-filename="{{ video_file }}">Delete Video</button>
+            </div>
+        {% endfor %}
     </div>
-{% endfor %}
 </div>
+
+
+<!--    <hr/>-->
+
+
+ <div class="container-fluid sec_uv">
+    <div class="row c1">
+        <!-- Left Column with Video List -->
+        <div class="col-lg-2  c1">
+            <div class="row">
+                {% for video_file in video_files %}
+                    <div class="col-lg-6 p-1 video-container" id="video{{ loop.index }}">
+                        <video class="w-100 thumb_video" controls onplay="setActiveVideo(this, '{{ video_file }}')">
+                            <source src="{{ url_for('static', filename='upload/' + video_file) }}" type="video/mp4" />
+                            <source src="{{ url_for('static', filename='upload/' + video_file) }}" type="video/mts" />
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Center Column with Active Video -->
+        <div class="col-lg-7 c1">
+            <div class="col video-container" id="activeVideo">
+                {% if video_files %}
+                    <!-- Display the first video initially -->
+                    <video class="w-100" controls>
+                        <source src="{{ url_for('static', filename='upload/' + video_files[0]) }}" type="video/mp4" />
+<!--                        <source src="{{ url_for('static', filename='upload/' + video_files[0]) }}" type="video/mts" />-->
+                        Your browser does not support the video tag.
+                    </video>
+
+
+
+                <div class="container ">
+ <div class="row ">
+
+                {% for audio_file in audio_files %}
+
+ <div class="col-lg-4 col-md-4 mt-3 ">
+
+                            <audio id="audio{{ loop.index }}" controls data-audiofile="{{ audio_file }}" class="audiodelete">
+                                <source src="{{ url_for('static', filename='upload/separate_audio/' + audio_file) }}" type="audio/mp3">
+                                Your browser does not support the audio tag.
+                            </audio>
+                        </div>
+
+                {% endfor %}
+
+                        </div>
+                        </div>
+
+                <button class="delete-btn del-vid-but" data-filename="{{ video_file }}">Delete Video</button>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Right Column with Audio -->
+        <div class="col-lg-3 c1" >
+
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // Set the active video and corresponding audio
+    function setActiveVideo(videoElement, videoFile) {
+        var activeMediaContainer = document.getElementById('activeMedia');
+        var activeVideo = activeMediaContainer.querySelector('video');
+        var activeAudio = activeMediaContainer.querySelector('audio');
+
+        // Set the active video
+        activeVideo.innerHTML = '';
+        var sourceMP4 = document.createElement('source');
+        sourceMP4.src = videoElement.querySelector('source[type="video/mp4"]').src;
+        sourceMP4.type = 'video/mp4';
+        activeVideo.appendChild(sourceMP4);
+        activeVideo.load();
+        activeVideo.play();
+
+        // Create the active audio element if it doesn't exist
+        if (!activeAudio) {
+            activeAudio = document.createElement('audio');
+            activeAudio.controls = true;
+            activeAudio.id = 'activeAudio';
+            activeMediaContainer.appendChild(activeAudio);
+        }
+
+        // Set the active audio based on the selected video
+        activeAudio.innerHTML = '';
+
+        {% for audio_file in audio_files %}
+            {% if audio_file.startswith(videoFile|replace(".mp4", "")) %}
+                var audioElement = document.createElement('audio');
+                audioElement.controls = true;
+                var sourceMP3 = document.createElement('source');
+                sourceMP3.src = '{{ url_for('static', filename='upload/separate_audio/' + audio_file) }}';
+                sourceMP3.type = 'audio/mp3';
+                audioElement.appendChild(sourceMP3);
+                activeAudio.appendChild(audioElement);
+            {% endif %}
+        {% endfor %}
+    }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+    function setAudio(video, videoFile) {
+        const videoName = videoFile.replace(".mp4", "");
+        const audioElements = document.querySelectorAll(`#video${video.id} audio[data-audiofile^='${videoName}']`);
+
+        if (audioElements.length > 0) {
+            audioElements.forEach(audioElement => {
+                audioElement.currentTime = 0;
+                audioElement.play();
+            });
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Add event listeners to all play buttons
+        const playButtons = document.querySelectorAll('.play-btn');
+        playButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const audioFile = this.getAttribute('data-audiofile');
+                const audioElement = document.querySelector(`audio[data-audiofile='${audioFile}']`);
+
+                if (audioElement) {
+                    if (audioElement.paused) {
+                        audioElement.currentTime = 0;
+                        audioElement.play();
+                    } else {
+                        audioElement.pause();
+                    }
+                }
+            });
+        });
+    });
+</script>
+
 
 </div>
     <script>
@@ -320,13 +504,15 @@ $(this).hide();
      <form method="POST" action="{{ url_for('generate_script') }}" id="generate_script_form">
       <div class="sortable-list" id="sortable-list">
         <!-- Add draggable attribute to each item -->
-        {% for video_file in video_files %}
-        <div class="draggable-item cursor" draggable="true" data-value="{{ video_file }}"  data-video-source="{{ url_for('static', filename='upload/' + video_file) }}">
+           {% if audio_files %}
+        {% for audio_file in audio_files %}
+        <div class="draggable-item cursor" draggable="true" data-value="{{ audio_file }}"  data-video-source="{{ url_for('static', filename='upload/' + audio_file) }}">
 
-      <input type="checkbox" name="video_filenames[]" value="{{ video_file }}" />{{ video_file }}<br />
+      <input type="checkbox" name="video_filenames[]" value="{{ audio_file }}" />{{ audio_file }}<br />
 <!--      <input type="hidden" name="selected_order[]" value="{{ video_file }}" />-->
 </div>
       {% endfor %}
+          {% endif %}
 </div>
       <input type="submit" value="Generate Script" id="generate-script-button" />
          <span style="color:red;display:none"  id="message_no_script">Please Select the Videos:</span>

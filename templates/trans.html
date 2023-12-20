@@ -186,21 +186,39 @@ var content = '';
 // Add the buttons to the button container
 
 <!-- <h2>Video ${i + 1}</h2>??-->
-vids.forEach(function (vid, i) {
+<!--vids.forEach(function (vid, i) {-->
 <!--    var button = createVideoButton(i + 1);-->
 <!--    buttonContainer.appendChild(button);-->
 <!--  <div id="content2" data-value="content2" class="draggable-item" draggable="true">-->
-    content += `<div id="content${i + 1}" data-value="content${i + 1}" class="content content-container position-relative" draggable="true" ondragstart="drag(event)"><span class="btn btn-secondary position-absolute span_btn" style="cursor:move;">Video ${i + 1}</span>`;
+
+vids.forEach(function (vid, i) {
+    content += `<div id="content${i + 1}" data-value="content${i + 1}" class="content content-container position-relative" draggable="true" ondragstart="drag(event)">
+                    <span class="btn btn-secondary position-absolute span_btn" style="cursor:move;">Video ${i + 1}</span>`;
     var count = 1;
 
-    vid.forEach(function (word) {
-        content += `<span id="${count}" start_time="${word.start}" end_time="${word.end}" speaker="${word.speaker}" >${word.word}</span>`;
+    vid.forEach(function (word, index) {
+        // Check if it's the first word or a new speaker
+        if (index === 0 || word.speaker !== vid[index - 1].speaker) {
+            content += `<div class="speaker-container" data-speaker="${word.speaker}"><h5>${word.speaker}:</h5> `;
+        }
+
+        content += `<span id="${count}" start_time="${word.start}" end_time="${word.end}">${word.word}</span>`;
+
+        // Check if it's the last word for the speaker
+        if (index === vid.length - 1 || word.speaker !== vid[index + 1].speaker) {
+            content += `</div>`;
+        } else {
+            content += ' ';
+        }
+
         count++;
     });
+
     content += `</div>`;
 });
 
 target.innerHTML = content;
+
 
 
 

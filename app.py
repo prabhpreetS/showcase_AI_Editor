@@ -7,8 +7,9 @@ from speechtotext import transcribenow
 import subprocess
 logging.basicConfig(level=logging.INFO)
 from pychannel import audio_channel_extraction
-from sd import transcribenow1
-from new import transcribenow2
+from ats import ats
+# from sd import transcribenow1
+# from new import transcribenow2
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
 app.config['SESSION_TYPE'] = 'filesystem'
@@ -96,11 +97,13 @@ def upload_file():
     else:
         # Get a list of all the video files in the "upload" folder
         video_files = [f for f in os.listdir('static/upload') if f.endswith('.mp4')]
+        audio_files = [f for f in os.listdir('static/upload/separate_audio') if f.endswith('.mp3')]
+
         app.logger.info('recieved get req:')
         app.logger.info(request.form)
         app.logger.info(request.files)
         # Render the HTML template and pass in the list of image and video files
-        return render_template('index.html', video_files=video_files)
+        return render_template('index.html', video_files=video_files,audio_files=audio_files)
 
 
 @app.route('/generate_script', methods=['POST'])
@@ -108,37 +111,47 @@ def generate_script():
     video_filenames = request.form.getlist('video_filenames[]')
     combined_script = []
     video_paths = []
+    total_transcript=[]
+    ats_combined_output = []
     for index,video_filename in enumerate(video_filenames):
         video_path = os.path.join('static', 'upload', video_filename)
         video_paths.append(video_path)
         print('videopath::'+video_path)
-
-        with mp.VideoFileClip(video_path) as clip:
-            audio_path_mp3 = os.path.join('static', 'upload', os.path.splitext(video_filename)[0] + '.mp3')
-
-            try:
-                clip.audio.write_audiofile(audio_path_mp3)
-                print(f'conversion successful: {audio_path_mp3}')
-                response = {'status': 'conversion successful', 'message': 'audio written successfully'}
-                app.logger.info(response)
-            except Exception as e:
-                print(f'error during conversion{e}')
-                response = {'status': 'conversion failed', 'message': 'audio is not available'}
-            finally:
-
-                clip.close()
+        audio_path_mp3 = os.path.join('static', 'upload', 'separate_audio', os.path.splitext(video_filename)[0] + '.mp3')
+        print(f'audioPahtmp3:::',audio_path_mp3)
+        # with mp.VideoFileClip(video_path) as clip:
+        #     # audio_path_mp3 = os.path.join('static', 'upload', os.path.splitext(video_filename)[0] + '.mp3')
+        #
+        #     try:
+        #         clip.audio.write_audiofile(audio_path_mp3)
+        #         print(f'conversion successful: {audio_path_mp3}')
+        #         response = {'status': 'conversion successful', 'message': 'audio written successfully'}
+        #         app.logger.info(response)
+        #     except Exception as e:
+        #         print(f'error during conversion{e}')
+        #         response = {'status': 'conversion failed', 'message': 'audio is not available'}
+        #     finally:
+        #
+        #         clip.close()
 
         with open(audio_path_mp3, 'rb'):
 
             print('video : ', index+1)
-            script = transcribenow1(audio_path_mp3)
+            script,transcript = transcribenow(audio_path_mp3)
             combined_script.append(script)
-    print('combined_script::',combined_script)
+            total_transcript.append(transcript)
+            print('transcript ---> ', transcript)
+            print('script ---> ', script)
+            combined_output = ats(transcript)
+            ats_combined_output.append(combined_output)
+            print('combined_output--->',combined_output)
+
+    #print('combined_script::',combined_script)
     #app.logger.info('this is video paths: ', len(video_paths))
-    app.logger.info(combined_script)
+    #app.logger.info(combined_script)
     session['video_path'] = video_paths
     app.logger.info(session['video_path'])
-    return render_template('trans.html', script=combined_script,response=response)
+    return render_template('trans.html', script=combined_script,ats_combined_output=ats_combined_output)
 
 @app.route('/delete_video_single', methods=['POST'])
 def delete_video_single():
@@ -155,8 +168,8 @@ def delete_video_single():
         app.logger.info(f"video_path-{video_path}")
 
     #return jsonify({'message': 'File deleted successfully'})
-    #return redirect(url_for('upload_file'))
-    return render_template('index.html', video_path=video_path)
+    return redirect(url_for('upload_file'))
+    #return render_template('index.html', video_path=video_path)
 
 
 
